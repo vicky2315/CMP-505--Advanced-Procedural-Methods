@@ -58,7 +58,7 @@ void Input::Update()
 	if (kb.Space) m_GameInput.generate = true;
 	else		m_GameInput.generate = false;
 
-	if (kb.PageDown) m_GameInput.smooth = true;
+	if (kb.F) m_GameInput.smooth = true;
 	else      m_GameInput.smooth = false;
 }
 

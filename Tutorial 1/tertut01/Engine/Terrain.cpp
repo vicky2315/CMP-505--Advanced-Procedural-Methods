@@ -414,7 +414,7 @@ int Terrain::GenerateHeightField()
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i;
-			m_heightMap[index].y = rand() % 10;
+			m_heightMap[index].y = (float)((rand() % 10)/2);
 			totalHeight += m_heightMap[index].y;
 			m_heightMap[index].z = (float)j;
 		}
@@ -447,7 +447,7 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 
 	averageHeight = GenerateHeightField();
 
-	result = CalculateNormals();
+ 	result = CalculateNormals();
 	if (!result)
 	{
 		return false;
@@ -461,8 +461,9 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 }
 
 
-void Terrain::SmoothTerrain(ID3D11Device* device)
+bool Terrain::SmoothTerrain(ID3D11Device* device)
 {
+	bool result;
 	int index;
 
 	for (int j = 0; j < m_terrainHeight; j++)
@@ -470,11 +471,27 @@ void Terrain::SmoothTerrain(ID3D11Device* device)
 		for (int i = 0; i < m_terrainWidth; i++)
 		{
 			index = (m_terrainHeight * j) + i;
-			if (m_heightMap[index].y != averageHeight)
-			{
-				m_heightMap[index].y = averageHeight;
-			}
+				if(m_heightMap[index].y <= averageHeight)
+				{
+					m_heightMap[index].y += 0.1f;
+				}
+
+				if (m_heightMap[index].y >= averageHeight)
+				{
+					m_heightMap[index].y -= 0.1f;
+				}
 		}
+	}
+	result = CalculateNormals();
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeBuffers(device);
+	if (!result)
+	{
+		return false;
 	}
 }
 

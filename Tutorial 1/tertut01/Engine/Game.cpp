@@ -207,8 +207,8 @@ void Game::Update(DX::StepTimer const& timer)
         }
     }
 #endif
+   
 
-  
 	if (m_input.Quit())
 	{
 		ExitGame();
