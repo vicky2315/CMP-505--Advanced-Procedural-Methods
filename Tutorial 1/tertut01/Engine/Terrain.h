@@ -21,12 +21,13 @@ public:
 	Terrain();
 	~Terrain();
 	float averageHeight;
+	double noisevariable;
 	int a;
 
 	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight);
 	void Render(ID3D11DeviceContext*);
 	bool GenerateHeightMap(ID3D11Device*);
-	bool GenerateHeightMap2(ID3D11Device*);
+	bool GenerateNoise(ID3D11Device*);
 	int GenerateHeightField();
 	bool SmoothTerrain(ID3D11Device*);
 	bool Update();

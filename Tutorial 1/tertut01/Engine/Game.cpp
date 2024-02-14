@@ -17,6 +17,7 @@ using namespace ImGui;
 
 using Microsoft::WRL::ComPtr;
 
+
 Game::Game() noexcept(false)
 {
     m_deviceResources = std::make_unique<DX::DeviceResources>();
@@ -32,6 +33,7 @@ Game::~Game()
     }
 #endif
 }
+
 
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(HWND window, int width, int height)

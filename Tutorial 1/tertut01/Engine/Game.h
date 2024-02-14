@@ -46,8 +46,14 @@ public:
 
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
+    void initialise_perm() {
+    };
+
+    int perm[512];
 	
 private:
+
+
 
 	struct MatrixBufferType
 	{
