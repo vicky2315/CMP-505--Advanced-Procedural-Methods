@@ -1,4 +1,5 @@
 #pragma once
+#include "ClassicNoise.h"
 
 using namespace DirectX;
 
@@ -22,7 +23,7 @@ public:
 	~Terrain();
 	float averageHeight;
 	double noisevariable;
-	int a;
+	double a;
 
 	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight);
 	void Render(ID3D11DeviceContext*);
@@ -54,5 +55,6 @@ private:
 	//arrays for our generated objects Made by directX
 	std::vector<VertexPositionNormalTexture> preFabVertices;
 	std::vector<uint16_t> preFabIndices;
+	ClassicNoise classicNoise;
 };
 
