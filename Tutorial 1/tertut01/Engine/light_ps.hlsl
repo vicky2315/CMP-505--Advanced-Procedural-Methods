@@ -42,6 +42,9 @@ float4 main(InputType input) : SV_TARGET
 	textureColor = shaderTexture.Sample(SampleType, input.tex);
 	color = color * textureColor;
 
+	if(input.position3D.y > 0)
+        color = float4(2.0, 0.0, 0.0, 2.0);
+	
     return color;
 }
 

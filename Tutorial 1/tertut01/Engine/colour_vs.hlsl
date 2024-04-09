@@ -24,7 +24,7 @@ struct OutputType
 OutputType main(InputType input)
 {
 	OutputType output;
-	
+    int x;
 	// Change the position vector to be 4 units for proper matrix calculations.
 	input.position.w = 1.0f;
 
@@ -39,7 +39,7 @@ OutputType main(InputType input)
 	// Store normals for the pixel shader
 	//output.normal = mul(input.normal, (float3x3)worldMatrix);
 	//output.normal = normalize(output.normal);
-
+	
 	output.colour = input.colour;
 
 	return output;

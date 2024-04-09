@@ -12,7 +12,8 @@ struct InputType
 
 float4 main(InputType input) : SV_TARGET
 {
+	if (input.position.y < 0)
+        input.colour = float4(2.0, 0.0, 0.0, 2.0);
 	//float4 colour = float4(1.0, 0.0, 0.0, 1.0);
-//	return float4(1.0, 0.0, 1.0, 1.0);	
 	return input.colour;
 }
