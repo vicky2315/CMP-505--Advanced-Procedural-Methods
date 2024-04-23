@@ -35,6 +35,12 @@ private:
 		float padding;
 	};
 
+	struct ScreenSizeBufferType
+	{
+		float screenWidth;
+		DirectX::SimpleMath::Vector3 padding;
+	};
+
 	//buffer to pass in camera world Position
 	struct CameraBufferType
 	{
@@ -49,5 +55,6 @@ private:
 	ID3D11Buffer*															m_matrixBuffer;
 	ID3D11SamplerState*														m_sampleState;
 	ID3D11Buffer*															m_lightBuffer;
+	ID3D11Buffer*															m_screenSizeBuffer = 0;
 };
 

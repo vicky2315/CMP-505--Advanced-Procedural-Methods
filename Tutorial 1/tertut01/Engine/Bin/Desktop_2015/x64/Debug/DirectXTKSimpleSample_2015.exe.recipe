@@ -18,6 +18,9 @@
     <ContentFile>
       <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\light_vs.cso</FullPath>
     </ContentFile>
+    <ContentFile>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\TestShader.cso</FullPath>
+    </ContentFile>
   </ContentFiles>
   <SatelliteDlls />
   <NonRecipeFileRefs />

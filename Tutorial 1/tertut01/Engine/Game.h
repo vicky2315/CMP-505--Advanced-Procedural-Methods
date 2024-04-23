@@ -63,6 +63,7 @@ private:
 
     void Update(DX::StepTimer const& timer);
     void Render();
+    void RenderTexturePass1();
     void Clear();
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
@@ -99,9 +100,13 @@ private:
 	//textures 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_texture1;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_texture2;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_GreyScale;
+
 
 	//Shaders
 	Shader																	m_BasicShaderPair;
+    Shader																	m_BasicShaderPair1;
+
 
 	//Scene. 
 	Terrain																	m_Terrain;

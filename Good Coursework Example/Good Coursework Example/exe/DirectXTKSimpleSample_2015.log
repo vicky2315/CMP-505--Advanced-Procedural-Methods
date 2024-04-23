@@ -1,0 +1,26 @@
+﻿  Game.cpp
+d:\wang\course\cmp505\source\game.cpp(186): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(191): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(196): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(201): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(206): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(211): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(216): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(221): warning C4244: “-=”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(236): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(289): warning C4244: “参数”: 从“size_t”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(322): warning C4244: “参数”: 从“LONG”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(369): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(369): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(442): warning C4551: 缺少参数列表的函数调用
+d:\wang\course\cmp505\source\game.cpp(697): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(698): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(748): warning C4244: “=”: 从“float”转换到“LONG”，可能丢失数据
+d:\wang\course\cmp505\source\game.cpp(750): warning C4244: “=”: 从“float”转换到“LONG”，可能丢失数据
+    正在创建库 Bin\Desktop_2015\x64\Release\TheCreator.lib 和对象 Bin\Desktop_2015\x64\Release\TheCreator.exp
+  正在生成代码
+  70 of 2546 functions ( 2.7%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    15 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  DirectXTKSimpleSample_2015.vcxproj -> D:\wang\Course\CMP505\source\Bin\Desktop_2015\x64\Release\TheCreator.exe

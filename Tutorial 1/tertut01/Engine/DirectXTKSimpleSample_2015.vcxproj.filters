@@ -152,5 +152,8 @@
     <FxCompile Include="light_vs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
+    <FxCompile Include="TestShader.hlsl" />
+    <FxCompile Include="BlurPS.hlsl" />
+    <FxCompile Include="BlurVS.hlsl" />
   </ItemGroup>
 </Project>

@@ -168,7 +168,7 @@ void Game::Update(DX::StepTimer const& timer)
 
 	if (m_gameInputCommands.generate)
 	{
-		m_Terrain.GenerateHeightMap(device);
+		m_Terrain.GenerateNoise(device);
 	}
     
     if (m_gameInputCommands.smooth)
@@ -244,13 +244,17 @@ void Game::Render()
 	context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
 	context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 	context->RSSetState(m_states->CullClockwise());
-//	context->RSSetState(m_states->Wireframe());
+	//context->RSSetState(m_states->Wireframe());
+
+	RenderTexturePass1();
+
 
 	//prepare transform for floor object. 
 	m_world = SimpleMath::Matrix::Identity; //set world back to identity
 	SimpleMath::Matrix newPosition3 = SimpleMath::Matrix::CreateTranslation(0.0f, -0.6f, 0.0f);
-	SimpleMath::Matrix newScale = SimpleMath::Matrix::CreateScale(0.1);		//scale the terrain down a little. 
-	m_world = m_world * newScale *newPosition3;
+	SimpleMath::Matrix newScale = SimpleMath::Matrix::CreateScale(0.1);
+    SimpleMath::Matrix newRotation = SimpleMath::Matrix::CreateRotationX(190);//scale the terrain down a little. 
+	m_world = m_world * newScale *newPosition3 * newRotation;
 
 	//setup and draw cube
 	m_BasicShaderPair.EnableShader(context);
@@ -262,10 +266,45 @@ void Game::Render()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	
 
+	m_sprites->Begin();
+	m_sprites->Draw(m_FirstRenderPass->getShaderResourceView(), m_CameraViewRect);
+	m_sprites->End();
+
     // Show the new frame.
     m_deviceResources->Present();
 }
 
+void Game::RenderTexturePass1()
+{
+	auto context = m_deviceResources->GetD3DDeviceContext();
+	auto renderTargetView = m_deviceResources->GetRenderTargetView();
+	auto depthTargetView = m_deviceResources->GetDepthStencilView();
+	// Set the render target to be the render to texture.
+	m_FirstRenderPass->setRenderTarget(context);
+	// Clear the render to texture.
+	m_FirstRenderPass->clearRenderTarget(context, 0.0f, 0.0f, 1.0f, 1.0f);
+
+	// Turn our shaders on,  set parameters
+	m_BasicShaderPair.EnableShader(context);
+	m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
+
+	//render our model
+	//m_BasicModel.Render(context);
+	
+	m_world = SimpleMath::Matrix::Identity; //set world back to identity
+	SimpleMath::Matrix newPosition3 = SimpleMath::Matrix::CreateTranslation(0.0f, -0.6f, 0.0f);
+	SimpleMath::Matrix newScale = SimpleMath::Matrix::CreateScale(0.1);
+	SimpleMath::Matrix newRotation = SimpleMath::Matrix::CreateRotationX(190);//scale the terrain down a little. 
+	m_world = m_world * newScale * newPosition3 * newRotation;
+
+	//setup and draw cube
+	m_BasicShaderPair1.EnableShader(context);
+	m_BasicShaderPair1.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
+	m_Terrain.Render(context);
+
+	// Reset the render target back to the original back buffer and not the render to texture anymore.	
+	context->OMSetRenderTargets(1, &renderTargetView, depthTargetView);
+}
 
 // Helper method to clear the back buffers.
 void Game::Clear()
@@ -364,7 +403,7 @@ void Game::CreateDeviceDependentResources()
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
 
 	//setup our terrain
-	m_Terrain.Initialize(device, 128, 128);
+	m_Terrain.Initialize(device, 256, 256);
 
 	//setup our test model
 	m_BasicModel.InitializeSphere(device);
@@ -373,6 +412,8 @@ void Game::CreateDeviceDependentResources()
 
 	//load and set up our Vertex and Pixel Shaders
 	m_BasicShaderPair.InitStandard(device, L"light_vs.cso", L"light_ps.cso");
+	m_BasicShaderPair1.InitStandard(device, L"light_vs.cso", L"TestShader.cso");
+
 
 	//load Textures
 	CreateDDSTextureFromFile(device, L"seafloor.dds",		nullptr,	m_texture1.ReleaseAndGetAddressOf());

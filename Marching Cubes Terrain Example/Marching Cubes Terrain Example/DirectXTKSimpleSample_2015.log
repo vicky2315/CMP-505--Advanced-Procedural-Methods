@@ -1,0 +1,11 @@
+﻿  Game.cpp
+C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\Game.cpp(650,11): warning C4101: 'lightViewMatrix': unreferenced local variable
+C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\Game.cpp(650,28): warning C4101: 'lightProjectionMatrix': unreferenced local variable
+C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\Game.cpp(770,24): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\Game.cpp(771,25): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\Game.cpp(802,54): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\Game.cpp(802,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  GeometryData.cpp
+C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\GeometryData.cpp(627,26): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
+  DirectXTKSimpleSample_2015.vcxproj -> C:\Users\aquar\OneDrive\Documents\Repos\AdvancedProceduralMethods\Bin\Desktop_2015\x64\Debug\AdvancedProcedural-1901120.exe

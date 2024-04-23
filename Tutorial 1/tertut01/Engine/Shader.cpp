@@ -16,6 +16,8 @@ bool Shader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psF
 	D3D11_BUFFER_DESC	matrixBufferDesc;
 	D3D11_SAMPLER_DESC	samplerDesc;
 	D3D11_BUFFER_DESC	lightBufferDesc;
+	D3D11_BUFFER_DESC screenSizeBufferDesc;
+
 
 	//LOAD SHADER:	VERTEX
 	auto vertexShaderBuffer = DX::ReadData(vsFilename);
@@ -76,6 +78,25 @@ bool Shader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psF
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	device->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer);
 
+	screenSizeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	screenSizeBufferDesc.ByteWidth = sizeof(ScreenSizeBufferType);
+	screenSizeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	screenSizeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	screenSizeBufferDesc.MiscFlags = 0;
+	screenSizeBufferDesc.StructureByteStride = 0;
+
+	device->CreateBuffer(&screenSizeBufferDesc, NULL, &m_screenSizeBuffer);
+
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&screenSizeBufferDesc, NULL, &m_screenSizeBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	return true;
+
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -102,6 +123,7 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleM
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	LightBufferType* lightPtr;
+	ScreenSizeBufferType* dataPtr2;
 	DirectX::SimpleMath::Matrix  tworld, tview, tproj;
 
 	// Transpose the matrices to prepare them for the shader.
@@ -124,6 +146,12 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleM
 	lightPtr->padding = 0.0f;
 	context->Unmap(m_lightBuffer, 0);
 	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
+
+	context->Map(m_screenSizeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+	// Get a pointer to the data in the constant buffer.
+	dataPtr2 = (ScreenSizeBufferType*)mappedResource.pData;
+
 
 	//pass the desired texture to the pixel shader.
 	context->PSSetShaderResources(0, 1, &texture1);
