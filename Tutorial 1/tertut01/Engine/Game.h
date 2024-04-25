@@ -106,6 +106,7 @@ private:
 	//Shaders
 	Shader																	m_BasicShaderPair;
     Shader																	m_BasicShaderPair1;
+    Shader                                                                  m_HorizontalBlur;
 
 
 	//Scene. 
@@ -113,9 +114,11 @@ private:
 	ModelClass																m_BasicModel;
 	ModelClass																m_BasicModel2;
 	ModelClass																m_BasicModel3;
+    ModelClass                                                              m_FullScreen;
 
 	//RenderTextures
 	RenderTexture*															m_FirstRenderPass;
+    RenderTexture*                                                          m_PostProcess;
 	RECT																	m_fullscreenRect;
 	RECT																	m_CameraViewRect;
 	

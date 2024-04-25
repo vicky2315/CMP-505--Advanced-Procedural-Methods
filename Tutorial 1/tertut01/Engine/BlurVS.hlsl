@@ -1,11 +1,11 @@
-cbuffer MatrixBuffer : register(b1)
+cbuffer MatrixBuffer : register(b0)
 {
     matrix worldMatrix;
     matrix viewMatrix;
     matrix projectionMatrix;
 };
 
-cbuffer ScreenSizeBuffer : register(b2)
+cbuffer ScreenSizeBuffer : register(b1)
 {
     float screenWidth;
     float3 padding;

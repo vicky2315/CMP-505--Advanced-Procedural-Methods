@@ -2,30 +2,30 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\Bin\Desktop_2015\x64\Debug\DirectXTKSimpleSample_2015.exe</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\Bin\Desktop_2015\x64\Debug\DirectXTKSimpleSample_2015.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles>
     <ContentFile>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\BlurPS.cso</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\BlurPS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\BlurVS.cso</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\BlurVS.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\colour_ps.cso</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\colour_ps.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\colour_vs.cso</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\colour_vs.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\light_ps.cso</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\light_ps.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\light_vs.cso</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\light_vs.cso</FullPath>
     </ContentFile>
     <ContentFile>
-      <FullPath>M:\GitHub\CMP-505--Advanced-Procedural-Methods\Tutorial 1\tertut01\Engine\TestShader.cso</FullPath>
+      <FullPath>M:\CMP 505 - Procedural Methods\Tutorial 1\tertut01\Engine\TestShader.cso</FullPath>
     </ContentFile>
   </ContentFiles>
   <SatelliteDlls />

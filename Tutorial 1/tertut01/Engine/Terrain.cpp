@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Terrain.h"
 #include "ClassicNoise.h"
+#include "SimplexNoise.h"
 
 
 Terrain::Terrain()
@@ -521,7 +522,7 @@ bool Terrain::GenerateNoise(ID3D11Device* device)
 		{
 			index = (m_terrainHeight * j) + i;
 
-			double f = ClassicNoise::noise((double)j / 10,(double)i / 10, 1);
+			double f = SimplexNoise::nNoise((double)j / 10,(double)i / 10, 1);
 			m_heightMap[index].y += f;
 			//m_heightMap[index].z = (float)j;
 		}

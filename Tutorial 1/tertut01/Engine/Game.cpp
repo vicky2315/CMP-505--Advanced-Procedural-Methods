@@ -134,6 +134,7 @@ void Game::Tick()
 	
 }
 
+
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {	
@@ -285,10 +286,12 @@ void Game::RenderTexturePass1()
 	m_FirstRenderPass->clearRenderTarget(context, 0.0f, 0.0f, 1.0f, 1.0f);
 
 	// Turn our shaders on,  set parameters
-	m_BasicShaderPair.EnableShader(context);
-	m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
+	//m_BasicShaderPair.EnableShader(context);
+	//m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
+	m_HorizontalBlur.EnableShader(context);
+	m_HorizontalBlur.SetShaderParametersBlur(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get(), 800);
 
-	//render our model
+	//render our model	
 	//m_BasicModel.Render(context);
 	
 	m_world = SimpleMath::Matrix::Identity; //set world back to identity
@@ -301,6 +304,7 @@ void Game::RenderTexturePass1()
 	m_BasicShaderPair1.EnableShader(context);
 	m_BasicShaderPair1.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
 	m_Terrain.Render(context);
+	m_FullScreen.Render(context);
 
 	// Reset the render target back to the original back buffer and not the render to texture anymore.	
 	context->OMSetRenderTargets(1, &renderTargetView, depthTargetView);
@@ -404,6 +408,8 @@ void Game::CreateDeviceDependentResources()
 
 	//setup our terrain
 	m_Terrain.Initialize(device, 256, 256);
+	m_FullScreen.InitializeBuffersForBlur(device, 1024, 800);
+
 
 	//setup our test model
 	m_BasicModel.InitializeSphere(device);
@@ -413,7 +419,7 @@ void Game::CreateDeviceDependentResources()
 	//load and set up our Vertex and Pixel Shaders
 	m_BasicShaderPair.InitStandard(device, L"light_vs.cso", L"light_ps.cso");
 	m_BasicShaderPair1.InitStandard(device, L"light_vs.cso", L"TestShader.cso");
-
+	m_HorizontalBlur.InitStandard(device, L"BlurVS.cso", L"BlurPS.cso");
 
 	//load Textures
 	CreateDDSTextureFromFile(device, L"seafloor.dds",		nullptr,	m_texture1.ReleaseAndGetAddressOf());
@@ -421,7 +427,7 @@ void Game::CreateDeviceDependentResources()
 
 	//Initialise Render to texture
 	m_FirstRenderPass = new RenderTexture(device, 800, 600, 1, 2);	//for our rendering, We dont use the last two properties. but.  they cant be zero and they cant be the same. 
-
+	m_PostProcess = new RenderTexture(device, 800, 600, 1, 2);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

@@ -1,5 +1,6 @@
 #pragma once
 #include "ClassicNoise.h"
+#include "SimplexNoise.h"
 
 using namespace DirectX;
 
@@ -56,5 +57,6 @@ private:
 	std::vector<VertexPositionNormalTexture> preFabVertices;
 	std::vector<uint16_t> preFabIndices;
 	ClassicNoise classicNoise;
+	SimplexNoise simplexNoise;
 };
 

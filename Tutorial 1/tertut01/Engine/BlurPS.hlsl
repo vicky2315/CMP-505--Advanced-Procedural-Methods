@@ -1,5 +1,5 @@
-Texture2D shaderTexture : register(t1);
-SamplerState SampleType : register(s1);
+Texture2D shaderTexture : register(t0);
+SamplerState SampleType : register(s0);
 
 
 struct PixelInputType

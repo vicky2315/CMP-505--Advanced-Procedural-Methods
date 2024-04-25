@@ -71,6 +71,7 @@
     <ClInclude Include="ClassicNoise.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="SimplexNoise.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -119,6 +120,7 @@
     <ClCompile Include="ClassicNoise.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="SimplexNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

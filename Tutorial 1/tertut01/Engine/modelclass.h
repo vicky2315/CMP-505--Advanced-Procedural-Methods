@@ -39,12 +39,14 @@ public:
 	bool InitializeBox(ID3D11Device*, float xwidth, float yheight, float zdepth);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
+	bool InitializeBuffersForBlur(ID3D11Device*, int windowWidth, int windowHeight);
 	
 	int GetIndexCount();
 
 
 private:
 	bool InitializeBuffers(ID3D11Device*);
+
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	bool LoadModel(char*);

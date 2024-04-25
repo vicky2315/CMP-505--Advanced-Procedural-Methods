@@ -16,6 +16,7 @@ public:
 	bool InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename);		//Loads the Vert / pixel Shader pair
 	bool SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix  *world, DirectX::SimpleMath::Matrix  *view, DirectX::SimpleMath::Matrix  *projection, Light *sceneLight1, ID3D11ShaderResourceView* texture1);
 	void EnableShader(ID3D11DeviceContext * context);
+	bool SetShaderParametersBlur(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float screenWidth);
 
 private:
 	//standard matrix buffer supplied to all shaders

@@ -117,7 +117,6 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleM
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	LightBufferType* lightPtr;
-	ScreenSizeBufferType* dataPtr2;
 	DirectX::SimpleMath::Matrix  tworld, tview, tproj;
 
 	// Transpose the matrices to prepare them for the shader.
@@ -141,11 +140,46 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleM
 	context->Unmap(m_lightBuffer, 0);
 	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
+	//pass the desired texture to the pixel shader.
+	context->PSSetShaderResources(0, 1, &texture1);
+
+	return false;
+}
+
+bool Shader::SetShaderParametersBlur(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float screenWidth)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	MatrixBufferType* dataPtr;
+	LightBufferType* lightPtr;
+	ScreenSizeBufferType* dataPtr2;
+	DirectX::SimpleMath::Matrix  tworld, tview, tproj;
+
+	// Transpose the matrices to prepare them for the shader.
+	tworld = world->Transpose();
+	tview = view->Transpose();
+	tproj = projection->Transpose();
+	context->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	dataPtr = (MatrixBufferType*)mappedResource.pData;
+	dataPtr->world = tworld;// worldMatrix;
+	dataPtr->view = tview;
+	dataPtr->projection = tproj;
+	context->Unmap(m_matrixBuffer, 0);
+	context->VSSetConstantBuffers(0, 1, &m_matrixBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the VS
+
+	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	lightPtr = (LightBufferType*)mappedResource.pData;
+	lightPtr->ambient = sceneLight1->getAmbientColour();
+	lightPtr->diffuse = sceneLight1->getDiffuseColour();
+	lightPtr->position = sceneLight1->getPosition();
+	lightPtr->padding = 0.0f;
+	context->Unmap(m_lightBuffer, 0);
+	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
+
 	context->Map(m_screenSizeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	dataPtr2 = (ScreenSizeBufferType*)mappedResource.pData;
 
 	// Copy the data into the constant buffer.
-	dataPtr2->screenWidth = 100;
+	dataPtr2->screenWidth = screenWidth;
 	dataPtr2->padding = DirectX::SimpleMath::Vector3(0.0f, 0.0f, 0.0f);
 
 	// Unlock the constant buffer.
@@ -170,5 +204,5 @@ void Shader::EnableShader(ID3D11DeviceContext * context)
 	context->PSSetShader(m_pixelShader.Get(), 0, 0);				//turn on pixel shader
 	// Set the sampler state in the pixel shader.
 	context->PSSetSamplers(0, 1, &m_sampleState);
-	context->DrawIndexed(1, 0, 0);
+	//context->DrawIndexed(1, 0, 0);
 }
