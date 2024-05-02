@@ -150,6 +150,16 @@ ID3D11ShaderResourceView* RenderTexture::getShaderResourceView()
 	return shaderResourceView;
 }
 
+ID3D11RenderTargetView* RenderTexture::getRenderTargetView()
+{
+	return renderTargetView;
+}
+
+ID3D11Texture2D* RenderTexture::getRenderTarget()
+{
+	return renderTargetTexture;
+}
+
 XMMATRIX RenderTexture::getProjectionMatrix()
 {
 	return projectionMatrix;

@@ -29,10 +29,11 @@ public:
 	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight);
 	void Render(ID3D11DeviceContext*);
 	bool GenerateHeightMap(ID3D11Device*);
-	bool GenerateNoise(ID3D11Device*);
+	bool GeneratePerlinNoise(ID3D11Device*);
+	bool GenerateSimplexNoise(ID3D11Device* device);
 	int GenerateHeightField();
 	bool SmoothTerrain(ID3D11Device*);
-	bool Update();
+	bool Update(ID3D11Device* device);
 	float* GetWavelength();
 
 	float* GetAmplitude();
@@ -40,7 +41,6 @@ public:
 private:
 	bool CalculateNormals();
 	void Shutdown();
-	void ShutdownBuffers();
 	bool InitializeBuffers(ID3D11Device*);
 	void RenderBuffers(ID3D11DeviceContext*);
 	

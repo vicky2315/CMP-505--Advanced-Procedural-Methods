@@ -14,7 +14,7 @@ public:
 	//we could extend this to load in only a vertex shader, only a pixel shader etc.  or specialised init for Geometry or domain shader. 
 	//All the methods here simply create new versions corresponding to your needs
 	bool InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename);		//Loads the Vert / pixel Shader pair
-	bool SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix  *world, DirectX::SimpleMath::Matrix  *view, DirectX::SimpleMath::Matrix  *projection, Light *sceneLight1, ID3D11ShaderResourceView* texture1);
+	bool SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix  *world, DirectX::SimpleMath::Matrix  *view, DirectX::SimpleMath::Matrix  *projection, Light *sceneLight1, ID3D11ShaderResourceView* texture1, float fogdensity=1.0f);
 	void EnableShader(ID3D11DeviceContext * context);
 	bool SetShaderParametersBlur(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float screenWidth);
 
@@ -33,7 +33,7 @@ private:
 		DirectX::SimpleMath::Vector4 ambient;
 		DirectX::SimpleMath::Vector4 diffuse;
 		DirectX::SimpleMath::Vector3 position;
-		float padding;
+		float fogdensity;
 	};
 
 	struct ScreenSizeBufferType
@@ -52,6 +52,14 @@ private:
 	//Shaders
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>								m_vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader>								m_pixelShader;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader>								m_bloomExtractPS;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader>								m_bloomCombinePS;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader>								m_gaussianBlurPS;
+
+	Microsoft::WRL::ComPtr<ID3D11Buffer>									m_bloomParams;
+	Microsoft::WRL::ComPtr<ID3D11Buffer>									m_blurParamsWidth;
+	Microsoft::WRL::ComPtr<ID3D11Buffer>									m_blurParamsHeight;
+
 	ID3D11InputLayout*														m_layout;
 	ID3D11Buffer*															m_matrixBuffer;
 	ID3D11SamplerState*														m_sampleState;

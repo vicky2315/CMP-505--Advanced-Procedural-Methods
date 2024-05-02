@@ -14,7 +14,8 @@ Terrain::~Terrain()
 {
 }
 
-
+float waveSpeed = 1.0f;
+float deltaTime = 0.1f;
 
 bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight)
 {
@@ -26,7 +27,8 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	m_terrainWidth = terrainWidth;
 	m_terrainHeight = terrainHeight;
 
-	m_frequency = m_terrainWidth / 20;
+	//m_frequency = m_terrainWidth / 20;
+	m_frequency = 0.3;
 	m_amplitude = 3.0;
 	m_wavelength = 1;
 
@@ -407,7 +409,7 @@ int Terrain::GenerateHeightField()
 	float totalHeight = 0.0f;
 	double b;
 
-	m_frequency = (6.283 / m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
+	//m_frequency = (6.283 / m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
 
 	//loop through the terrain and set the heights how we want. This is where we generate the terrain
 	//in this case I will run a sin-wave through the terrain in one axis.
@@ -431,13 +433,25 @@ int Terrain::GenerateHeightField()
 bool Terrain::GenerateHeightMap(ID3D11Device* device)
 {
 	bool result;
-	double b;
 	int index;
 	float height = 0.0;
-	m_frequency = (6.283/m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
+	float minFrequency = 0.3f;
+	float maxFrequency = 1.0f;
+	//float t = 0.5f + 0.5f * sin(waveSpeed * 0.2f);
+
+	//m_frequency = (6.283/m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
 
 	//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
 	//in this case I will run a sin-wave through the terrain in one axis.
+	
+
+	if (m_frequency >= maxFrequency)
+	{
+ 		m_frequency = minFrequency;
+	}
+
+	waveSpeed = m_frequency * deltaTime;
+
 
 	for (int j = 0; j<m_terrainHeight; j++)
 	{
@@ -445,27 +459,32 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 		{
 			index = (m_terrainHeight * j) + i;
 
-			m_heightMap[index].x = (float)i;
-//			m_heightMap[index].y = (float)(sin((float)i *(m_frequency))*m_amplitude); 
-			m_heightMap[index].z = (float)j;
+			//m_heightMap[index].x = (float)i;
+			m_heightMap[index].y = (float)(sin((float)i *(waveSpeed))*m_amplitude); 
+			//m_heightMap[index].z = (float)j;
 		}
 	}
+	//m_amplitude += waveSpeed * deltaTime;    // Adjust amplitude over time
 
-	averageHeight = GenerateHeightField();
-	GenerateNoise(device);
+
+
+	//averageHeight = GenerateHeightField();
+	//GeneratePerlinNoise(device);
  
 
- 	result = CalculateNormals();
-	if (!result)
-	{
-		return false;
-	}
+ //	result = CalculateNormals();
+	//if (!result)
+	//{
+	//	return false;
+	//}
 
 	result = InitializeBuffers(device);
-	if (!result)
-	{
-		return false;
-	}
+	//if (!result)
+	//{
+	//	return false;
+	//}
+	return true;
+
 }
 
 
@@ -503,7 +522,8 @@ bool Terrain::SmoothTerrain(ID3D11Device* device)
 	}
 }
 
-bool Terrain::GenerateNoise(ID3D11Device* device)
+
+bool Terrain::GeneratePerlinNoise(ID3D11Device* device)
 {
 	bool result;
 
@@ -511,7 +531,7 @@ bool Terrain::GenerateNoise(ID3D11Device* device)
 	float height = 0.0;
 	double b, newvalue;
 
-	m_frequency = (6.283 / m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
+	//m_frequency = (6.283 / m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
 
 	//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
 	//in this case I will run a sin-wave through the terrain in one axis.
@@ -522,7 +542,7 @@ bool Terrain::GenerateNoise(ID3D11Device* device)
 		{
 			index = (m_terrainHeight * j) + i;
 
-			double f = SimplexNoise::nNoise((double)j / 10,(double)i / 10, 1);
+			double f = ClassicNoise::noise((double)j / 10,(double)i / 10, 1);
 			m_heightMap[index].y += f;
 			//m_heightMap[index].z = (float)j;
 		}
@@ -541,8 +561,49 @@ bool Terrain::GenerateNoise(ID3D11Device* device)
 	}
 }
 
-bool Terrain::Update()
+
+bool Terrain::GenerateSimplexNoise(ID3D11Device* device)
 {
+	bool result;
+
+	int index;
+	float height = 0.0;
+	double b, newvalue;
+
+	//m_frequency = (6.283 / m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
+
+	//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
+	//in this case I will run a sin-wave through the terrain in one axis.
+
+	for (int j = 0; j < m_terrainHeight; j++)
+	{
+		for (int i = 0; i < m_terrainWidth; i++)
+		{
+			index = (m_terrainHeight * j) + i;
+
+			double f = SimplexNoise::nNoise((double)j / 10, (double)i / 10, 1);
+			m_heightMap[index].y += f;
+			//m_heightMap[index].z = (float)j;
+		}
+	}
+
+	result = CalculateNormals();
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeBuffers(device);
+	if (!result)
+	{
+		return false;
+	}
+}
+
+bool Terrain::Update(ID3D11Device* device)
+{
+	m_frequency += 0.01f;
+	GenerateHeightMap(device);
 	return true; 
 }
 

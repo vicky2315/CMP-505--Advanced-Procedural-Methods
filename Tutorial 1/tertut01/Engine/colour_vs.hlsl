@@ -13,12 +13,14 @@ struct InputType
 {
 	float4 position : POSITION;
 	float4 colour : COLOR;
+    float2 tex : TEXCOORD0;
 };
 
 struct OutputType
 {
 	float4 position : SV_POSITION;
 	float4 colour : COLOR;
+    float2 tex : TEXCOORD0;
 };
 
 OutputType main(InputType input)

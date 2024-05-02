@@ -135,9 +135,13 @@
       <Filter>Assets</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="Bloom.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="directx.ico">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="darksky.jpg">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>
@@ -157,5 +161,9 @@
     <FxCompile Include="TestShader.hlsl" />
     <FxCompile Include="BlurPS.hlsl" />
     <FxCompile Include="BlurVS.hlsl" />
+    <FxCompile Include="BloomCombine.hlsl" />
+    <FxCompile Include="BloomExtract.hlsl" />
+    <FxCompile Include="GaussianBlur.hlsl" />
+    <FxCompile Include="Cloud_PS.hlsl" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,8 @@
 #include "RenderTexture.h"
 #include "Terrain.h"
 #include "ClassicNoise.h"
+#include "SimplexNoise.h"
+#include "PostProcess.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -68,6 +70,8 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 	void SetupGUI();
+    void PostProcess();
+    void GenerateVolumetricFogTexture(ID3D11ShaderResourceView** fogTexture);
 
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
@@ -101,6 +105,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_texture1;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_texture2;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_GreyScale;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_background;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_Cloud;
+
+
 
 
 	//Shaders
@@ -118,10 +126,16 @@ private:
 
 	//RenderTextures
 	RenderTexture*															m_FirstRenderPass;
-    RenderTexture*                                                          m_PostProcess;
+    RenderTexture*                                                          m_offscreenTexture;
+    RenderTexture*                                                          m_renderTarget1;
+    RenderTexture*                                                          m_renderTarget2;
+
+
+
 	RECT																	m_fullscreenRect;
 	RECT																	m_CameraViewRect;
-	
+    RECT                                                                    T_FullScreen;
+    RECT                                                                    T_BloomSize;
 
 
 #ifdef DXTK_AUDIO
@@ -131,6 +145,7 @@ private:
     std::unique_ptr<DirectX::SoundEffectInstance>                           m_effect1;
     std::unique_ptr<DirectX::SoundEffectInstance>                           m_effect2;
 #endif
+    std::unique_ptr<DirectX::BasicPostProcess>                              m_trialPostProcess;
     
 
 #ifdef DXTK_AUDIO
@@ -140,7 +155,17 @@ private:
     bool                                                                    m_retryDefault;
 #endif
 
+
     DirectX::SimpleMath::Matrix                                             m_world;
     DirectX::SimpleMath::Matrix                                             m_view;
     DirectX::SimpleMath::Matrix                                             m_projection;
+
+
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>                               m_bloomExtractPS;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>                               m_bloomCombinePS;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader>                               m_gaussianBlurPS;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer>                                    m_bloomParams;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>                                    m_blurParamsWidth;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>                                    m_blurParamsHeight;
 };

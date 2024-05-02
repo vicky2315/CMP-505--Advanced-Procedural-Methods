@@ -40,6 +40,8 @@ public:
 	void setRenderTarget(ID3D11DeviceContext* deviceContext);		///< Set this render texture as the render target
 	void clearRenderTarget(ID3D11DeviceContext* deviceContext, float red, float green, float blue, float alpha);	///< Empties the render texture, provide device context and RGBA (background colour)
 	ID3D11ShaderResourceView* getShaderResourceView();			///< Get the data from this render target as a texture resource.
+	ID3D11RenderTargetView* getRenderTargetView();
+	ID3D11Texture2D* getRenderTarget();
 
 	XMMATRIX getProjectionMatrix();		///< Get the projection matrix related to this render target (Could be different based on dimensions or near/far plane)
 	XMMATRIX getOrthoMatrix();			///< Get the orthographics matrix stored within this render target (could be different based on dimension)
