@@ -31,7 +31,7 @@ public:
 	bool GenerateHeightMap(ID3D11Device*);
 	bool GeneratePerlinNoise(ID3D11Device*);
 	bool GenerateSimplexNoise(ID3D11Device* device);
-	int GenerateHeightField();
+	int GenerateHeightField(ID3D11Device* device);
 	bool SmoothTerrain(ID3D11Device*);
 	bool Update(ID3D11Device* device);
 	float* GetWavelength();

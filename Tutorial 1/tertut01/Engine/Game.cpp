@@ -107,7 +107,7 @@ namespace
         None
     };
 
-    BloomPresets g_Bloom = Soft;
+    BloomPresets g_Bloom = Blurry;
 
     static const VS_BLOOM_PARAMETERS g_BloomPresets[] =
     {
@@ -186,7 +186,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_Camera01.setPosition(Vector3(0.0f, 0.0f, 4.0f));
 	m_Camera01.setRotation(Vector3(-90.0f, -180.0f, 0.0f));	//orientation is -90 becuase zero will be looking up at the sky straight up. 
 
-#ifdef DXTK_AUDIO
+
     // Create DirectXTK for Audio objects
     AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
 #ifdef _DEBUG
@@ -202,12 +202,21 @@ void Game::Initialize(HWND window, int width, int height)
     m_waveBank = std::make_unique<WaveBank>(m_audEngine.get(), L"adpcmdroid.xwb");
 
     m_soundEffect = std::make_unique<SoundEffect>(m_audEngine.get(), L"MusicMono_adpcm.wav");
-    m_effect1 = m_soundEffect->CreateInstance();
-    m_effect2 = m_waveBank->CreateInstance(10);
 
-    m_effect1->Play(true);
-    m_effect2->Play();
-#endif
+
+    m_WaveEmitter.SetPosition(Vector3(0.0f, -0.6f, 0.0f));
+    m_WaveEffect = std::make_unique<SoundEffect>(m_audEngine.get(), L"waves.wav");
+    m_WaveEffectIns = m_WaveEffect->CreateInstance(SoundEffectInstance_Use3D);
+
+    //m_effect2 = m_waveBank->CreateInstance(10);
+
+    m_listener.SetPosition(m_Camera01.getPosition());
+   
+    m_WaveEffectIns->Play(true);
+
+    //m_effect1->Play(true);
+    //m_effect2->Play();
+
 }
 
 #pragma region Frame Update
@@ -227,7 +236,7 @@ void Game::Tick()
 	//Render all game content. 
     Render();
 
-#ifdef DXTK_AUDIO
+
     // Only update audio engine once per frame
     if (!m_audEngine->IsCriticalError() && m_audEngine->Update())
     {
@@ -235,9 +244,6 @@ void Game::Tick()
         m_audioTimerAcc = 1.f;
         m_retryDefault = true;
     }
-#endif
-
-	
 }
 
 // Updates the world.
@@ -274,12 +280,12 @@ void Game::Update(DX::StepTimer const& timer)
 
 	if (m_gameInputCommands.generate)
 	{
-		m_Terrain.GenerateHeightMap(device);
+		m_WaterTerrain.GenerateHeightMap(device);
 	}
     
     if (m_gameInputCommands.smooth)
     {
-        m_Terrain.SmoothTerrain(device);
+        m_WaterTerrain.SmoothTerrain(device);
     }
 
 	//m_Terrain.GenerateHeightMap(device);
@@ -290,6 +296,8 @@ void Game::Update(DX::StepTimer const& timer)
 
 	/*create our UI*/
 	SetupGUI();
+
+    m_listener.Update(m_Camera01.getPosition(), Vector3::Up, 0.1f);
 
 #ifdef DXTK_AUDIO
     m_audioTimerAcc -= (float)timer.GetElapsedSeconds();
@@ -315,7 +323,7 @@ void Game::Update(DX::StepTimer const& timer)
         }
     }
 #endif
-   
+    m_WaveEffectIns->Apply3D(m_listener, m_WaveEmitter, false);
 
 	if (m_input.Quit())
 	{
@@ -353,46 +361,55 @@ void Game::Render()
 	//context->RSSetState(m_states->Wireframe());
 
 
-	//RenderTexturePass1();
-    
-    //GenerateVolumetricFogTexture(&m_Cloud);
-
 	//prepare transform for floor object. 
 	m_world = SimpleMath::Matrix::Identity; //set world back to identity
 	SimpleMath::Matrix newPosition3 = SimpleMath::Matrix::CreateTranslation(0.0f, -0.6f, 0.0f);
 	SimpleMath::Matrix newScale = SimpleMath::Matrix::CreateScale(0.1);
     SimpleMath::Matrix newRotation = SimpleMath::Matrix::CreateRotationX(0);//scale the terrain down a little. 
-	m_world = m_world * newScale *newPosition3 * newRotation;
+	m_world = m_world * newScale * newPosition3 * newRotation;
 
-	//setup and draw cube
+    //GenerateVolumetricFogTexture(&m_Cloud);
+
+	//setup and draw water body
 	m_BasicShaderPair.EnableShader(context);
-	m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
-	m_Terrain.Render(context);
-	
+	m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_water.Get());
+	m_WaterTerrain.Render(context);
+
+
+    m_world = SimpleMath::Matrix::Identity; //set world back to identity
+    newPosition3 = SimpleMath::Matrix::CreateTranslation(0.0f, 1.6f, 0.0f);
+    m_world = m_world * newScale * newPosition3 * newRotation;
+
+    m_BasicShaderPair.EnableShader(context);
+    m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
+    m_GroundTerrain.Render(context);
+
 	//render our GUI
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-    RenderTexturePass1();
-    PostProcess();
+    RenderToTexturePass(); //create minimap
 
-	m_sprites->Begin();
-	m_sprites->Draw(m_FirstRenderPass->getShaderResourceView(), m_CameraViewRect);
-	m_sprites->End();
+    if(m_postprocess==true)
+    {
+        PostProcess();
+    }
+    else
+    {
+        m_sprites->Begin();
+        m_sprites->Draw(m_FirstRenderPass->getShaderResourceView(), m_CameraViewRect);
+        m_sprites->End();
+    }
 
     // Show the new frame.
     m_deviceResources->Present();
+
 }
 
 
 void Game::PostProcess()
 {
     auto context = m_deviceResources->GetD3DDeviceContext();
-    //auto renderTargetView = m_offscreenTexture->getRenderTargetView();
-    //auto depthTargetView = m_deviceResources->GetDepthStencilView();
-
-   // m_offscreenTexture->setRenderTarget(context);
-
 
     ID3D11ShaderResourceView* null[] = { nullptr, nullptr };
 
@@ -446,6 +463,7 @@ void Game::PostProcess()
         m_sprites->Draw(rt2SRV, T_BloomSize);
         m_sprites->End();
 
+        
         // RT1 + scene
         auto renderTarget = m_deviceResources->GetRenderTargetView();
         context->OMSetRenderTargets(1, &renderTarget, nullptr);
@@ -460,6 +478,9 @@ void Game::PostProcess()
         m_sprites->End();
     }
     context->PSSetShaderResources(0, 2, null);
+
+    ImGui::Render();
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
 
@@ -471,7 +492,7 @@ void Game::GenerateVolumetricFogTexture(ID3D11ShaderResourceView** fogTexture)
     const int height = 128;
 
     // Create a 3D texture for volumetric fog
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture3D;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture2D;
     CD3D11_TEXTURE2D_DESC textureDesc(
         DXGI_FORMAT_R8G8B8A8_UNORM,
         width,
@@ -479,7 +500,7 @@ void Game::GenerateVolumetricFogTexture(ID3D11ShaderResourceView** fogTexture)
         1,
         D3D11_BIND_SHADER_RESOURCE
     );
-    device->CreateTexture2D(&textureDesc, nullptr, texture3D.GetAddressOf());
+    device->CreateTexture2D(&textureDesc, nullptr, texture2D.GetAddressOf());
 
     // Initialize texture data
     std::vector<Color> texels(width * height);
@@ -488,7 +509,7 @@ void Game::GenerateVolumetricFogTexture(ID3D11ShaderResourceView** fogTexture)
             for (int x = 0; x < width; ++x)
             {
                 // Calculate Perlin noise value at current position
-                float noise = ClassicNoise::noise(x / float(width), y / float(height), 1);
+                float noise = ClassicNoise::noise(x / float(width*10), y / float(height*10), 1);
 
                 // Set fog density based on noise value (adjust parameters as needed)
                 float density = noise * 0.5f + 0.5f; // Map noise to [0, 1] range
@@ -502,15 +523,15 @@ void Game::GenerateVolumetricFogTexture(ID3D11ShaderResourceView** fogTexture)
         }
 
     // Upload texture data to GPU
-    context->UpdateSubresource(texture3D.Get(), 0, nullptr, texels.data(), width * sizeof(Color), 0);
+    context->UpdateSubresource(texture2D.Get(), 0, nullptr, texels.data(), width * sizeof(Color), 0);
 
     // Create shader resource view for the texture
     CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(D3D11_SRV_DIMENSION_TEXTURE2D, textureDesc.Format);
-    device->CreateShaderResourceView(texture3D.Get(), &srvDesc, fogTexture);
+    device->CreateShaderResourceView(texture2D.Get(), &srvDesc, fogTexture);
 }
 
 
-void Game::RenderTexturePass1()
+void Game::RenderToTexturePass()
 {
 	auto context = m_deviceResources->GetD3DDeviceContext();
 	auto renderTargetView = m_deviceResources->GetRenderTargetView();
@@ -518,16 +539,7 @@ void Game::RenderTexturePass1()
 	// Set the render target to be the render to texture.
 	m_FirstRenderPass->setRenderTarget(context);
 	// Clear the render to texture.
-	m_FirstRenderPass->clearRenderTarget(context, 0.0f, 0.0f, 1.0f, 1.0f);
-
-	// Turn our shaders on,  set parameters
-	//m_BasicShaderPair.EnableShader(context);
-	//m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
-	//m_HorizontalBlur.EnableShader(context);
-	//m_HorizontalBlur.SetShaderParametersBlur(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get(), 800);
-
-	//render our model	
-	//m_BasicModel.Render(context);
+    m_FirstRenderPass->clearRenderTarget(context, 0.0f, 0.0f, 1.0f, 1.0f);
 	
 	m_world = SimpleMath::Matrix::Identity; //set world back to identity
 	SimpleMath::Matrix newPosition3 = SimpleMath::Matrix::CreateTranslation(0.0f, -0.6f, 0.0f);
@@ -537,9 +549,8 @@ void Game::RenderTexturePass1()
 
 	//setup and draw cube
 	m_BasicShaderPair1.EnableShader(context);
-	m_BasicShaderPair1.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get());
-	m_Terrain.Render(context);
-	//m_FullScreen.Render(context);
+	m_BasicShaderPair1.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_water.Get());
+	m_WaterTerrain.Render(context);
 
 	// Reset the render target back to the original back buffer and not the render to texture anymore.	
 	context->OMSetRenderTargets(1, &renderTargetView, depthTargetView);
@@ -680,8 +691,8 @@ void Game::CreateDeviceDependentResources()
 
 
 	//setup our terrain
-	m_Terrain.Initialize(device, 64, 64);
-	m_FullScreen.InitializeBuffersForBlur(device, 1024, 800);
+	m_WaterTerrain.Initialize(device, 64, 64);
+    m_GroundTerrain.Initialize(device, 64, 64);
 
 	//setup our test model
 	m_BasicModel.InitializeSphere(device);
@@ -697,6 +708,8 @@ void Game::CreateDeviceDependentResources()
 	CreateDDSTextureFromFile(device, L"seafloor.dds",		nullptr,	m_texture1.ReleaseAndGetAddressOf());
 	CreateDDSTextureFromFile(device, L"EvilDrone_Diff.dds", nullptr,	m_texture2.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"cloud.dds",          nullptr,    m_Cloud.ReleaseAndGetAddressOf());
+    CreateDDSTextureFromFile(device, L"water.dds",          nullptr,    m_water.ReleaseAndGetAddressOf());
+
 
 	//Initialise Render to texture
 	m_FirstRenderPass = new RenderTexture(device, 800, 600, 1, 2);	//for our rendering, We dont use the last two properties. but.  they cant be zero and they cant be the same. 
@@ -753,16 +766,20 @@ void Game::SetupGUI()
 	ImGui::NewFrame();
 
 	ImGui::Begin("Parameters");
-		ImGui::SliderFloat("Wave Amplitude",	m_Terrain.GetAmplitude(), 0.0f, 10.0f);
+		ImGui::SliderFloat("Wave Amplitude",	m_WaterTerrain.GetAmplitude(), 0.0f, 10.0f);
 		//ImGui::SliderFloat("Wavelength",		m_Terrain.GetWavelength(), 0.0f, 1.0f);
 		ImGui::BeginChild("Noise Types");
 		{
 			if(ImGui::Button("Perlin Noise"))
-				m_Terrain.GeneratePerlinNoise(device);
+				m_WaterTerrain.GeneratePerlinNoise(device);
 			if (ImGui::Button("Simplex Noise"))
-				m_Terrain.GenerateSimplexNoise (device);
+				m_WaterTerrain.GenerateSimplexNoise (device);
 			if (ImGui::Button("GenerateWaves"))
-				m_Terrain.Update(device); 
+				m_WaterTerrain.Update(device); 
+            if(ImGui::Button("Generate Random Height"))
+                m_WaterTerrain.GenerateHeightField(device);
+            if (ImGui::Button("Post Process"))
+                m_postprocess = !m_postprocess;
 		}
 		ImGui::EndChild();
 	ImGui::End();

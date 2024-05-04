@@ -144,6 +144,9 @@
     <Image Include="darksky.jpg">
       <Filter>Assets</Filter>
     </Image>
+    <Image Include="water.jpg">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="colour_ps.hlsl">

@@ -400,7 +400,7 @@ void Terrain::RenderBuffers(ID3D11DeviceContext * deviceContext)
 	return;
 }
 
-int Terrain::GenerateHeightField()
+int Terrain::GenerateHeightField(ID3D11Device* device)
 {
 	bool result;
 
@@ -421,13 +421,25 @@ int Terrain::GenerateHeightField()
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i;
-			//m_heightMap[index].y = (float)((rand() % 10)/2);
+			m_heightMap[index].y = (float)((rand() % 10)/2);
 			totalHeight += m_heightMap[index].y;
 			m_heightMap[index].z = (float)j;
 
 		}
 	}
 	return (totalHeight / index);
+
+	result = CalculateNormals();
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeBuffers(device);
+	if (!result)
+	{
+		return false;
+	}
 }
 
 bool Terrain::GenerateHeightMap(ID3D11Device* device)
@@ -472,11 +484,11 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 	//GeneratePerlinNoise(device);
  
 
- //	result = CalculateNormals();
-	//if (!result)
-	//{
-	//	return false;
-	//}
+ 	result = CalculateNormals();
+	if (!result)
+	{
+		return false;
+	}
 
 	result = InitializeBuffers(device);
 	//if (!result)

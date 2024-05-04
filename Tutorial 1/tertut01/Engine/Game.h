@@ -15,6 +15,7 @@
 #include "ClassicNoise.h"
 #include "SimplexNoise.h"
 #include "PostProcess.h"
+#include "Audio.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -65,7 +66,7 @@ private:
 
     void Update(DX::StepTimer const& timer);
     void Render();
-    void RenderTexturePass1();
+    void RenderToTexturePass();
     void Clear();
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
@@ -107,6 +108,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_GreyScale;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_background;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_Cloud;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_water;
 
 
 
@@ -118,7 +120,8 @@ private:
 
 
 	//Scene. 
-	Terrain																	m_Terrain;
+	Terrain																	m_WaterTerrain;
+    Terrain                                                                 m_GroundTerrain;
 	ModelClass																m_BasicModel;
 	ModelClass																m_BasicModel2;
 	ModelClass																m_BasicModel3;
@@ -138,22 +141,26 @@ private:
     RECT                                                                    T_BloomSize;
 
 
-#ifdef DXTK_AUDIO
+
     std::unique_ptr<DirectX::AudioEngine>                                   m_audEngine;
     std::unique_ptr<DirectX::WaveBank>                                      m_waveBank;
     std::unique_ptr<DirectX::SoundEffect>                                   m_soundEffect;
-    std::unique_ptr<DirectX::SoundEffectInstance>                           m_effect1;
+    std::unique_ptr<DirectX::SoundEffect>                                   m_WaveEffect;
+    std::unique_ptr<DirectX::SoundEffectInstance>                           m_WaveEffectIns;
     std::unique_ptr<DirectX::SoundEffectInstance>                           m_effect2;
-#endif
+    DirectX::AudioListener                                                  m_listener;
+    DirectX::AudioEmitter                                                   m_WaveEmitter;
+
     std::unique_ptr<DirectX::BasicPostProcess>                              m_trialPostProcess;
     
 
-#ifdef DXTK_AUDIO
+
     uint32_t                                                                m_audioEvent;
     float                                                                   m_audioTimerAcc;
 
     bool                                                                    m_retryDefault;
-#endif
+    bool                                                                    m_postprocess = false;
+
 
 
     DirectX::SimpleMath::Matrix                                             m_world;
